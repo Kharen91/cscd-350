@@ -84,10 +84,54 @@ public class Parser{
 	}
 
 	public void treeCreate(String input) {
+		String parserCheck = null;
+		String output = null;
 		
+		//Split off leading term into 2-slot array
+		String[] splitArray = input.split(" ", 2);
+	    parserCheck = splitArray[0];
+	    
+	    if(splitArray.length > 1) {
+	    	output = splitArray[1];
+	    }
+	    
+	    //Navigation Tree
+	  	if(parserCheck.equals("ACTUATOR")){
+	  	    //Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("CONTROLLER")) {
+	  		//Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("DEPENDENCY")) {
+	  		//Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("MAPPER")) {
+	  		//Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("REPORTER")) {
+	  		//Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("SENSOR")) {
+	  		//Insert Code Here
+	  	}
+	  	else if(parserCheck.equals("WATCHDOG")) {
+	  		//Insert Code Here
+	  	}
 	}
 	
 	public void treeSend(String input) {
+		String parserCheck = null;
+		String output = null;
 		
+		//Split off leading term into 2-slot array
+		String[] splitArray = input.split(" ", 2);
+	    parserCheck = splitArray[0];
+	    
+	    if(splitArray.length > 1) {
+	    	output = splitArray[1];
+	    }
+	    
+	    //Navigation Tree
+	    
 	}
 }
