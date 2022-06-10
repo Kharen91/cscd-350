@@ -95,7 +95,7 @@ public class Parser{
 			//Insert Code Here
 		}
 		if(parserCheck.equals("BUILD")){
-			//Insert Code Here
+			buildNetwork(output);
 		}
 	}
 
@@ -411,5 +411,41 @@ public class Parser{
 		    	System.out.println("Sensor s2 Added to Table");
 	    	}
 	    }
-	}	    
+	}
+	
+	public void buildNetwork(String input) {
+		//Split input string as usual
+		String[] splitArray = input.split(" ", 0);
+		
+		//Variable List
+		Identifier myName = null; 		//Identifier.make("input");
+		A_Component newPiece = null;
+		
+		//Iterate through input array
+		for(int i = 0; i < splitArray.length; i++) {
+			if(splitArray[i].equals("COMPONENT") || splitArray[i].equals("COMPONENTS")) {
+				for(int j = i+1; j < splitArray.length; j++) {
+					//Make an Identifier out of the term
+					myName = Identifier.make(splitArray[j]);
+
+					//Figure out what type of piece is needed, then get it
+					if(parserHelper.getSymbolTableController().contains(myName) == true){
+						newPiece = parserHelper.getSymbolTableController().get(myName);
+					}
+					else if(parserHelper.getSymbolTableActuator().contains(myName) == true){
+						newPiece = parserHelper.getSymbolTableActuator().get(myName);
+					}
+
+					else if(parserHelper.getSymbolTableSensor().contains(myName) == true){
+						newPiece = parserHelper.getSymbolTableSensor().get(myName);
+					}
+					//Add to ControllerMaster
+					parserHelper.getControllerMaster().addComponent(newPiece);
+				}
+			}
+		}
+		
+		parserHelper.getNetwork().writeOutput();
+		
+	}
 }
