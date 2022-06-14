@@ -105,7 +105,7 @@ public class Parser{
 			}
 		}
 		
-		if(parserCheck.equals("@EXIT")){		//If first term is @EXIT
+		if(parserCheck.equals("@exit")){		//If first term is @EXIT
 			this.parserHelper.exit();			//End the program
 		}
 		
@@ -654,100 +654,61 @@ public class Parser{
 	
 	public void createReporter(String input)
 	{
-		String[] splitArray = input.split(" ", 0);
-		Identifier reporterName = Identifier.make(splitArray[0]);
-		int delta = 0;
-		int frequency = 0;
+		//Variable List
+		List<Identifier> reporterIDs = Collections.<Identifier>emptyList();
+		List<Identifier> reporterGroups = Collections.<Identifier>emptyList();
+		Identifier IDname = null;
+		Identifier GroupName = null;
 		
-		List<Identifier> reporterIDs = null;
-		List<Identifier> reporterGroups = null;
-		int reporterIDSlot = 0;
+		int reporterValue = 0;	//This variable pulls double-duty as either Delta value OR Freq. value
+		
 		int reporterGroupSlot = 0;
-    	
+		int reporterTypeSlot = 0;
 		
-		if(splitArray[0] == "FREQUENCY")
-		{
-	    	for(int scan = 3; scan < splitArray.length; scan++) {
-	    		if(splitArray[scan].equals("IDS")) {
-	    			reporterIDSlot = scan;
-	    		}
-	    		else if(splitArray[scan].equals("GROUPS")) {
-	    			reporterGroupSlot = scan;
-	    		}
-	    	}
-			
-			for(int i = 3; i < splitArray.length; i++) {
-	    		if(splitArray[i].equals("IDS")) {
-	    			
-	    			if(reporterIDSlot != 0) {
-	    				for(int j = i+1; j < reporterIDSlot; j++) {
-	    					Identifier val = Identifier.make(splitArray[j]);
-	    					reporterIDs.add(val);
-	    					
-	    				}
-	    			}
-	    		}
-	    		else if(splitArray[i].equals("GROUPS"))
-	    		{
-	    			if(reporterGroupSlot != 0) {
-	    				for(int j = i+1; j < reporterGroupSlot; j++) {
-	    					Identifier val = Identifier.make(splitArray[j]);
-	    					reporterGroups.add(val);
-	    					
-	    				}
-	    			}
-	    		}
-	    		if(splitArray[i].equals("FREQUENCY")) {	//Once we find the "FREQUENCY" term
-		   			
-	    			frequency = Integer.parseInt(splitArray[i+1]);
-					
-	    		}
+		//Split input into a searchable array
+		String[] splitArray = input.split(" ", 0);
+
+		//Name is always splitArray[1]
+		Identifier reporterName = Identifier.make(splitArray[1]);		
+		
+		//Start initial scan for slot values
+		for(int scan = 0; scan < splitArray.length; scan++) {
+			if(splitArray[scan].equals("GROUPS")) {
+				reporterGroupSlot = scan;
 			}
-			
-			ReporterFrequency r = new ReporterFrequency(reporterIDs, reporterGroups, frequency);
-			parserHelper.getSymbolTableReporter().add(reporterName, r);
+			if(splitArray[scan].equals("DELTA") || splitArray[scan].equals("FREQUENCY")) {
+				reporterTypeSlot = scan;
+				reporterValue = Integer.parseInt(splitArray[scan + 1]); //Since we're already here, grab the value at the end
+			}
 		}
 		
-		else if(splitArray[0] == "CHANGE")
-		{
-			for(int scan = 3; scan < splitArray.length; scan++) {
-	    		if(splitArray[scan].equals("IDS")) {
-	    			reporterIDSlot = scan;
-	    		}
-	    		else if(splitArray[scan].equals("GROUPS")) {
-	    			reporterGroupSlot = scan;
-	    		}
-	    	}
-			
-			for(int i = 3; i < splitArray.length; i++) {
-				if(splitArray[i].equals("IDS")) {
-	    			
-	    			if(reporterIDSlot != 0) {
-	    				for(int j = i+1; j < reporterIDSlot; j++) {
-	    					Identifier val = Identifier.make(splitArray[j]);
-	    					reporterIDs.add(val);
-	    					
-	    				}
-	    			}
-	    		}
-	    		else if(splitArray[i].equals("GROUPS"))
-	    		{
-	    			if(reporterGroupSlot != 0) {
-	    				for(int j = i+1; j < reporterGroupSlot; j++) {
-	    					Identifier val = Identifier.make(splitArray[j]);
-	    					reporterGroups.add(val);
-	    					
-	    				}
-	    			}
-	    		}
-	    		if(splitArray[i].equals("DELTA")) {	//Once we find the "DELTA" term
-		   			
-	    			delta = Integer.parseInt(splitArray[i+1]);
-					
-	    		}
+		//Second For-Loop to gather ID values and Group values
+		for(int i = 0; i < splitArray.length; i++) {
+			if(splitArray[i].equals("IDS")) {
+				for(int j = i + 1; j < reporterGroupSlot; j++) {
+					IDname = Identifier.make(splitArray[j]);
+					reporterIDs.add(IDname);
+				}
 			}
-			
-			ReporterChange r = new ReporterChange(reporterIDs, reporterGroups, delta);
+			if(splitArray[i].equals("GROUPS")) {
+				for(int j = i + 1; j < reporterTypeSlot; j++) {
+					GroupName = Identifier.make(splitArray[j]);
+					reporterGroups.add(GroupName);
+				}
+			}
+		}
+		
+		// 0          1
+		// CHANGE     id  NOTIFY  [ids]  [groups]  DELTA      value
+		// FREQUENCY  id  NOTIFY  [ids]  [groups]  FREQUENCY  value
+
+		//Determine type of Reporter needed and call constructor
+		if(splitArray[0].equals("CHANGE")) {
+			ReporterChange r = new ReporterChange(reporterIDs, reporterGroups, reporterValue);
+			parserHelper.getSymbolTableReporter().add(reporterName, r);
+		}
+		if(splitArray[0].equals("FREQUENCY")) {
+			ReporterFrequency r = new ReporterFrequency(reporterIDs, reporterGroups, reporterValue);
 			parserHelper.getSymbolTableReporter().add(reporterName, r);
 		}
 	}
